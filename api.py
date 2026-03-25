@@ -1,6 +1,5 @@
 import json
 
-
 def write(filename: str, exercise: str, weight: int, reps: int) -> None:
     with open(filename, "r") as file:
         data = json.load(file)
@@ -27,9 +26,3 @@ def read(filename: str, exercise: str | None = None) -> dict:
             return {}
         else:
             return output
-
-
-if __name__ == "__main__":
-    n = read("data.json", "lat_pull")
-    print(n)
-        
