@@ -1,6 +1,20 @@
+from PyQt6.QtCore import Qt
+
 from api import read, write
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget
+import sys
+
+
+class MainWindow(QMainWindow):
+    def __init__(self) -> None:
+        super().__init__()
+        self.setWindowTitle("gym-tracker")
+
 
 if __name__ == "__main__":
-    n = read("data.json", "lat_pull")
-    print(n)
-        
+    app = QApplication(sys.argv)
+
+    window = MainWindow()
+    window.show()
+
+    app.exec()
