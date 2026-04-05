@@ -13,6 +13,11 @@
     <span>to</span>
     <input type="text" id="write_input2" placeholder="attr">
 
+    <br><br>
+
+    <button onclick="remove_button_click()">remove</button>
+    <input type="text" id="remove_input" placeholder="attribute">
+    
     <script>
       async function get_value(attr) {
           const response = await fetch(`http://localhost:5000/get_attr/${attr}`);
@@ -27,7 +32,16 @@
                 body: JSON.stringify({text: text, attr: attr})
               }
 
-          )
+          );
+      }
+
+      async function remove_attr(attr) {
+          await fetch(`http://localhost:5000/remove_attr/${attr}`,
+              {
+                method: "POST",
+              }
+
+          );
       }
 
       async function req_button_click() {
@@ -36,10 +50,15 @@
           document.getElementById("text").textContent = value;
       }
       async function write_button_click() {
-        let text = document.getElementById("write_input1").value;
-        let attr = document.getElementById("write_input2").value;
-        await post_value(text, attr)
-      }      
+          let text = document.getElementById("write_input1").value;
+          let attr = document.getElementById("write_input2").value;
+          await post_value(text, attr)
+      }
+      
+      async function remove_button_click() {
+          let attr = document.getElementById("remove_input").value;
+          await remove_attr(attr);
+      }
 
     </script>
   </body>
