@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <p id="text">...</p>
+
+    <button onclick="req_button_click()">request</button>
+    <input type="text" id="req_input" placeholder="attribute">
+
+    <br><br>
+
+    <button>write</button>
+    <input type="text" id="write_input1" placeholder="text">
+    <span>to</span>
+    <input type="text" id="write_input2" placeholder="attr">
+
+    <script>
+      async function get_value(attr) {
+          const response = await fetch(`http://localhost:5000/get_attr/${attr}`);
+          const data = await response.text();
+          return data;
+      }
+      async function post_value(text, attr) {
+          
+      }
+
+      async function req_button_click() {
+          let text = document.getElementById("req_input").value;
+          let value = await get_value(text);
+          document.getElementById("text").textContent = value;
+      }
+      async function write_button_click() {
+        let text = document.getElementById("write_input1").value;
+        let value = document.getElementById("write_input2").value;
+      }      
+
+    </script>
+  </body>
+</html>
