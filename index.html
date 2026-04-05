@@ -8,7 +8,7 @@
 
     <br><br>
 
-    <button>write</button>
+    <button onclick="write_button_click()">write</button>
     <input type="text" id="write_input1" placeholder="text">
     <span>to</span>
     <input type="text" id="write_input2" placeholder="attr">
@@ -20,7 +20,14 @@
           return data;
       }
       async function post_value(text, attr) {
-          
+          await fetch("http://localhost:5000/write_attr",
+              {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({text: text, attr: attr})
+              }
+
+          )
       }
 
       async function req_button_click() {
@@ -30,7 +37,8 @@
       }
       async function write_button_click() {
         let text = document.getElementById("write_input1").value;
-        let value = document.getElementById("write_input2").value;
+        let attr = document.getElementById("write_input2").value;
+        await post_value(text, attr)
       }      
 
     </script>
