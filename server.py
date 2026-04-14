@@ -1,44 +1,56 @@
-from flask import Flask, jsonify, request
-from flask_cors import CORS
-import json
+import sqlite3
+import datetime
 
-app = Flask(__name__)
-CORS(app)
+class Database:
+    def __init__(self, file_path):
+        self.conn = sqlite3.connect(file_path)
+        self.cursor = self.conn.cursor()
 
-@app.route("/get_attr/<attr>")
-def get_attr(attr):
-    with open("data.json", "r", encoding="utf-8") as f:
-        data = json.load(f)
-    return str(data[attr])
+class Workout:
+    @staticmethod
+    def add_workout(db, date):
+        try:
+            db.cursor.execute("INSERT INTO workouts (date) VALUES (?)", (str(date),))
+            db.conn.commit()
+            print("workout added")
+        except sqlite3.IntegrityError:
+            print("ERROR: workout already exists for this date")
+            
+    @staticmethod
+    def get_workouts(db):
+        db.cursor.execute("SELECT * FROM workouts")
+        return db.cursor.fetchall()
+    
+class Exercise:
+    @staticmethod
+    def add_exercise(db, workout_id, name, weight, reps, adjustment_lvl=None):
+        pass
+    
 
-@app.route("/write_attr", methods=["POST"])
-def write_attr():
-    body = request.get_json()
-    text = body["text"]
-    attr = body["attr"]
-    
-    with open("data.json", "r", encoding="utf-8") as f:
-        data = json.load(f)
-    
-    data[attr] = text
-    
-    with open("data.json", "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=4)
-    
-    return jsonify({"success": True })
 
-@app.route("/remove_attr/<attr>", methods=["POST"])
-def remove_attr(attr):
-    with open("data.json", "r", encoding="utf-8") as f:
-        data = json.load(f)
-    
-    data.pop(attr, None)
-    
-    with open("data.json", "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=4)
-    
-    return jsonify({"success": True })
+def create_tables(db):
+    db.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS workouts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT NOT NULL UNIQUE
+        )        
+    """)
+    db.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS exercises (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            workout_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            weight INTEGER NOT NULL,
+            reps INTEGER NOT NULL,
+            adjustment_lvl INTEGER,
+            FOREIGN KEY (workout_id) REFERENCES workouts(id)
+        )        
+    """)
+    db.conn.commit()
+    print("tables created")
 
 if __name__ == "__main__":
-    app.run(debug=True)
-    
+    db = Database("data.db")
+    create_tables(db)
+    Workout.add_workout(db, datetime.date.today())
+    print(Workout.get_workouts(db))
