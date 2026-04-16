@@ -60,15 +60,18 @@ def create_tables(db):
     db.conn.commit()
     print("tables created")
     
-def add_exercise(db, workout_id, name, weight, reps, adjustment_lvl=None):
-    db.cursor.execute("SELECT * FROM workouts WHERE id = ?", (workout_id,))
-    if not db.cursor.fetchone():
-        print("ERROR: Workout doesnt exist")
-        Workout.add_workout(db, datetime.date.today())
-        print("New workout added")
+def add_exercise(db, name, weight, reps, adjustment_lvl=None):
+    db.cursor.execute("SELECT MAX(id) FROM workouts")
+    last_id = db.cursor.fetchone()[0]
+    
+    db.cursor.execute("SELECT date FROM workouts WHERE id = ?", (last_id,))
+    date = db.cursor    .fetchone()
+    today = str(datetime.date.today())
+    if date == today:
+        Workout.add_workout(db, today)
         
-    Exercise.add_exercise(db, workout_id, name, weight, reps, adjustment_lvl)
-    print(f"exercise added to workout {workout_id}")
+    Exercise.add_exercise(db, last_id + 1, name, weight, reps, adjustment_lvl)
+    print(f"exercise added to workout {last_id + 1}")
         
 
 if __name__ == "__main__":
