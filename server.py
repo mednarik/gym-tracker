@@ -25,8 +25,13 @@ class Exercise:
     @staticmethod
     def add_exercise(db, workout_id, name, weight, reps, adjustment_lvl=None):
         
-        db.cursor.execute("INSERT INTO exercises (workout_id, name, weight, reps, adjustment_lvl) VALUES (?, ?, ?, ?, ?)", 
-                          (workout_id, name, weight, reps, adjustment_lvl))
+        db.cursor.execute("SELECT * FROM exercises WHERE name = (?)", (name,))
+        if db.cursor.fetchone():
+            db.cursor.execute("UPDATE exercises SET weight = (?), reps = (?), adjustment_lvl = (?) WHERE name = (?)", 
+                              (weight, reps, adjustment_lvl, name))
+        else:
+            db.cursor.execute("INSERT INTO exercises (workout_id, name, weight, reps, adjustment_lvl) VALUES (?, ?, ?, ?, ?)", 
+                            (workout_id, name, weight, reps, adjustment_lvl))
         db.conn.commit()
     
     @staticmethod
@@ -57,18 +62,20 @@ def create_tables(db):
     
 def add_exercise(db, workout_id, name, weight, reps, adjustment_lvl=None):
     db.cursor.execute("SELECT * FROM workouts WHERE id = ?", (workout_id,))
-    if db.cursor.fetchone():
-        Exercise.add_exercise(db, workout_id, name, weight, reps)
-        print(f"exercise added to workout {workout_id}")    
-    else:
+    if not db.cursor.fetchone():
         print("ERROR: Workout doesnt exist")
+        Workout.add_workout(db, datetime.date.today())
+        print("New workout added")
+        
+    Exercise.add_exercise(db, workout_id, name, weight, reps, adjustment_lvl)
+    print(f"exercise added to workout {workout_id}")
+        
 
 if __name__ == "__main__":
     db = Database("data.db")
     create_tables(db)
     
     Workout.add_workout(db, datetime.date.today())
-    add_exercise(db, 1, "bench_press", 50, 7)
+    add_exercise(db, 2, "bench_press", 60, 8)
     print("Exercises", Exercise.get_exercises(db))
     print("Workouts", Workout.get_workouts(db))
-    
