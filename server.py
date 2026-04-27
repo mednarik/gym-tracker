@@ -65,9 +65,9 @@ def add_exercise(db, name, weight, reps, adjustment_lvl=None):
     last_id = db.cursor.fetchone()[0]
     
     db.cursor.execute("SELECT date FROM workouts WHERE id = ?", (last_id,))
-    date = db.cursor    .fetchone()
+    date = db.cursor.fetchone()[0]
     today = str(datetime.date.today())
-    if date == today:
+    if date != today:
         Workout.add_workout(db, today)
         
     Exercise.add_exercise(db, last_id + 1, name, weight, reps, adjustment_lvl)
@@ -79,6 +79,6 @@ if __name__ == "__main__":
     create_tables(db)
     
     Workout.add_workout(db, datetime.date.today())
-    add_exercise(db, 2, "bench_press", 60, 8)
+    add_exercise(db, "bench_press", 60, 8)
     print("Exercises", Exercise.get_exercises(db))
     print("Workouts", Workout.get_workouts(db))
