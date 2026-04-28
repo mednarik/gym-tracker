@@ -24,11 +24,13 @@ class Workout:
 class Exercise:
     @staticmethod
     def add_exercise(db, workout_id, name, weight, reps, adjustment_lvl=None):
-        
-        db.cursor.execute("SELECT * FROM exercises WHERE name = (?)", (name,))
-        if db.cursor.fetchone():
-            db.cursor.execute("UPDATE exercises SET weight = (?), reps = (?), adjustment_lvl = (?) WHERE name = (?)", 
-                              (weight, reps, adjustment_lvl, name))
+        db.cursor.execute("SELECT weight, reps FROM exercises WHERE name = (?)", (name,))
+        row = db.cursor.fetchone()
+        if row:
+            if weight > row[0] or reps > row[1]:
+                db.cursor.execute("UPDATE exercises SET weight = (?), reps = (?), adjustment_lvl = (?) WHERE name = (?)", 
+                                (weight, reps, adjustment_lvl, name))
+                print("updated exercises stats")
         else:
             db.cursor.execute("INSERT INTO exercises (workout_id, name, weight, reps, adjustment_lvl) VALUES (?, ?, ?, ?, ?)", 
                             (workout_id, name, weight, reps, adjustment_lvl))
@@ -60,25 +62,33 @@ def create_tables(db):
     db.conn.commit()
     print("tables created")
     
-def add_exercise(db, name, weight, reps, adjustment_lvl=None):
+def add_exercise(db, name, weight, reps, adjustment_lvl=None) -> None:
+    today = str(datetime.date.today())
+
     db.cursor.execute("SELECT MAX(id) FROM workouts")
     last_id = db.cursor.fetchone()[0]
-    
+    if last_id is None:
+        Workout.add_workout(db, today)
+        Exercise.add_exercise(db, 1, name, weight, reps, adjustment_lvl)
+        print(f"exercise added to workout {1}")
+        return
+        
     db.cursor.execute("SELECT date FROM workouts WHERE id = ?", (last_id,))
     date = db.cursor.fetchone()[0]
-    today = str(datetime.date.today())
     if date != today:
         Workout.add_workout(db, today)
-        
-    Exercise.add_exercise(db, last_id + 1, name, weight, reps, adjustment_lvl)
-    print(f"exercise added to workout {last_id + 1}")
+        Exercise.add_exercise(db, last_id + 1, name, weight, reps, adjustment_lvl)
+        print(f"exercise added to workout {last_id + 1}")
+        return
+    
+    Exercise.add_exercise(db, last_id, name, weight, reps, adjustment_lvl)
+    print(f"exercise added to workout {last_id}")
         
 
 if __name__ == "__main__":
     db = Database("data.db")
     create_tables(db)
     
-    Workout.add_workout(db, datetime.date.today())
     add_exercise(db, "bench_press", 60, 8)
     print("Exercises", Exercise.get_exercises(db))
     print("Workouts", Workout.get_workouts(db))
