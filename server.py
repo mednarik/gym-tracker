@@ -12,6 +12,8 @@ class Database:
         self.conn = sqlite3.connect(file_path)
         self.cursor = self.conn.cursor()
 
+db = Database("data.db")
+
 class Workout:
     @staticmethod
     def add_workout(db, date):
@@ -93,7 +95,7 @@ def add_exercise(db, name, weight, reps, adjustment_lvl=None) -> None:
         
 
 if __name__ == "__main__":
-    db = Database("data.db")
+    
 
     create_tables(db)
     print("Exercises", Exercise.get_exercises(db))
