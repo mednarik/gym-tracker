@@ -1,2 +1,0 @@
-fix the Exercise.add_exercise method so that it also tracks the workout_id.
-overthink the workout/exercise logic

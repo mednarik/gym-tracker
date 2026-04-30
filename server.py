@@ -24,12 +24,12 @@ class Workout:
 class Exercise:
     @staticmethod
     def add_exercise(db, workout_id, name, weight, reps, adjustment_lvl=None):
-        db.cursor.execute("SELECT weight, reps FROM exercises WHERE name = (?)", (name,))
+        db.cursor.execute("SELECT weight, reps FROM exercises WHERE workout_id = (?) AND name = (?)", (workout_id, name))
         row = db.cursor.fetchone()
         if row:
             if weight > row[0] or reps > row[1]:
-                db.cursor.execute("UPDATE exercises SET weight = (?), reps = (?), adjustment_lvl = (?) WHERE name = (?)", 
-                                (weight, reps, adjustment_lvl, name))
+                db.cursor.execute("UPDATE exercises SET weight = (?), reps = (?), adjustment_lvl = (?) WHERE name = (?) AND workout_id = (?)", 
+                                (weight, reps, adjustment_lvl, name, workout_id))
                 print("updated exercises stats")
         else:
             db.cursor.execute("INSERT INTO exercises (workout_id, name, weight, reps, adjustment_lvl) VALUES (?, ?, ?, ?, ?)", 
@@ -60,7 +60,7 @@ def create_tables(db):
         )        
     """)
     db.conn.commit()
-    print("tables created")
+    print("tables created maybe")
     
 def add_exercise(db, name, weight, reps, adjustment_lvl=None) -> None:
     today = str(datetime.date.today())
@@ -89,6 +89,6 @@ if __name__ == "__main__":
     db = Database("data.db")
     create_tables(db)
     
-    add_exercise(db, "bench_press", 60, 8)
+    add_exercise(db, "bench_press", 60, 10)
     print("Exercises", Exercise.get_exercises(db))
     print("Workouts", Workout.get_workouts(db))
