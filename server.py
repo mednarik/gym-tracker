@@ -1,5 +1,11 @@
 import sqlite3
 import datetime
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+import json
+
+app = Flask(__name__)
+CORS(app)
 
 class Database:
     def __init__(self, file_path):
@@ -62,6 +68,7 @@ def create_tables(db):
     db.conn.commit()
     print("tables created maybe")
     
+@app.route("/add_exercise", methods=["POST"])
 def add_exercise(db, name, weight, reps, adjustment_lvl=None) -> None:
     today = str(datetime.date.today())
 
@@ -87,8 +94,9 @@ def add_exercise(db, name, weight, reps, adjustment_lvl=None) -> None:
 
 if __name__ == "__main__":
     db = Database("data.db")
+
     create_tables(db)
-    
-    add_exercise(db, "bench_press", 60, 10)
     print("Exercises", Exercise.get_exercises(db))
     print("Workouts", Workout.get_workouts(db))
+    
+    app.run(debug=True)
