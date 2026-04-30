@@ -1,3 +1,5 @@
+import sqlite3
+import datetime
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import json
@@ -5,40 +7,96 @@ import json
 app = Flask(__name__)
 CORS(app)
 
-@app.route("/get_attr/<attr>")
-def get_attr(attr):
-    with open("data.json", "r", encoding="utf-8") as f:
-        data = json.load(f)
-    return str(data[attr])
+class Database:
+    def __init__(self, file_path):
+        self.conn = sqlite3.connect(file_path)
+        self.cursor = self.conn.cursor()
 
-@app.route("/write_attr", methods=["POST"])
-def write_attr():
-    body = request.get_json()
-    text = body["text"]
-    attr = body["attr"]
+class Workout:
+    @staticmethod
+    def add_workout(db, date):
+        try:
+            db.cursor.execute("INSERT INTO workouts (date) VALUES (?)", (str(date),))
+            db.conn.commit()
+            print("workout added")
+        except sqlite3.IntegrityError:
+            print("ERROR: workout already exists for this date")
+            
+    @staticmethod
+    def get_workouts(db):
+        db.cursor.execute("SELECT * FROM workouts")
+        return db.cursor.fetchall()
     
-    with open("data.json", "r", encoding="utf-8") as f:
-        data = json.load(f)
+class Exercise:
+    @staticmethod
+    def add_exercise(db, workout_id, name, weight, reps, adjustment_lvl=None):
+        db.cursor.execute("SELECT weight, reps FROM exercises WHERE workout_id = (?) AND name = (?)", (workout_id, name))
+        row = db.cursor.fetchone()
+        if row:
+            if weight > row[0] or reps > row[1]:
+                db.cursor.execute("UPDATE exercises SET weight = (?), reps = (?), adjustment_lvl = (?) WHERE name = (?) AND workout_id = (?)", 
+                                (weight, reps, adjustment_lvl, name, workout_id))
+                print("updated exercises stats")
+        else:
+            db.cursor.execute("INSERT INTO exercises (workout_id, name, weight, reps, adjustment_lvl) VALUES (?, ?, ?, ?, ?)", 
+                            (workout_id, name, weight, reps, adjustment_lvl))
+        db.conn.commit()
     
-    data[attr] = text
-    
-    with open("data.json", "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=4)
-    
-    return jsonify({"success": True })
+    @staticmethod
+    def get_exercises(db):
+        db.cursor.execute("SELECT * FROM exercises")
+        return db.cursor.fetchall()
 
-@app.route("/remove_attr/<attr>", methods=["POST"])
-def remove_attr(attr):
-    with open("data.json", "r", encoding="utf-8") as f:
-        data = json.load(f)
+def create_tables(db):
+    db.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS workouts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT NOT NULL UNIQUE
+        )        
+    """)
+    db.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS exercises (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            workout_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            weight REAL NOT NULL,
+            reps INTEGER NOT NULL,
+            adjustment_lvl INTEGER,
+            FOREIGN KEY (workout_id) REFERENCES workouts(id)
+        )        
+    """)
+    db.conn.commit()
+    print("tables created maybe")
     
-    data.pop(attr, None)
+@app.route("/add_exercise", methods=["POST"])
+def add_exercise(db, name, weight, reps, adjustment_lvl=None) -> None:
+    today = str(datetime.date.today())
+
+    db.cursor.execute("SELECT MAX(id) FROM workouts")
+    last_id = db.cursor.fetchone()[0]
+    if last_id is None:
+        Workout.add_workout(db, today)
+        Exercise.add_exercise(db, 1, name, weight, reps, adjustment_lvl)
+        print(f"exercise added to workout {1}")
+        return
+        
+    db.cursor.execute("SELECT date FROM workouts WHERE id = ?", (last_id,))
+    date = db.cursor.fetchone()[0]
+    if date != today:
+        Workout.add_workout(db, today)
+        Exercise.add_exercise(db, last_id + 1, name, weight, reps, adjustment_lvl)
+        print(f"exercise added to workout {last_id + 1}")
+        return
     
-    with open("data.json", "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=4)
-    
-    return jsonify({"success": True })
+    Exercise.add_exercise(db, last_id, name, weight, reps, adjustment_lvl)
+    print(f"exercise added to workout {last_id}")
+        
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    db = Database("data.db")
+
+    create_tables(db)
+    print("Exercises", Exercise.get_exercises(db))
+    print("Workouts", Workout.get_workouts(db))
     
+    app.run(debug=True)
