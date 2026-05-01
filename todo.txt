@@ -1,1 +1,2 @@
-adjust frontend to fit backend
+Classic Flask + SQLite threading issue. The db object is created at startup in the main thread, but Flask handles requests in different threads.
+Fix — create the database connection per request using Flask's g object:

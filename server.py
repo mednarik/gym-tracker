@@ -71,7 +71,12 @@ def create_tables(db):
     print("tables created maybe")
     
 @app.route("/add_exercise", methods=["POST"])
-def add_exercise(db, name, weight, reps, adjustment_lvl=None) -> None:
+def add_exercise() -> None:
+    data = request.get_json()
+    name = data["name"]
+    weight = data["weight"]
+    reps = data["reps"]
+    adjustment_lvl = data.get("adjustment_lvl")
     today = str(datetime.date.today())
 
     db.cursor.execute("SELECT MAX(id) FROM workouts")
@@ -80,7 +85,7 @@ def add_exercise(db, name, weight, reps, adjustment_lvl=None) -> None:
         Workout.add_workout(db, today)
         Exercise.add_exercise(db, 1, name, weight, reps, adjustment_lvl)
         print(f"exercise added to workout {1}")
-        return
+        return jsonify({"message": "exercise added to workout 1"})
         
     db.cursor.execute("SELECT date FROM workouts WHERE id = ?", (last_id,))
     date = db.cursor.fetchone()[0]
@@ -88,10 +93,11 @@ def add_exercise(db, name, weight, reps, adjustment_lvl=None) -> None:
         Workout.add_workout(db, today)
         Exercise.add_exercise(db, last_id + 1, name, weight, reps, adjustment_lvl)
         print(f"exercise added to workout {last_id + 1}")
-        return
+        return jsonify({"message": f"exercise added to workout {last_id + 1}"})
     
     Exercise.add_exercise(db, last_id, name, weight, reps, adjustment_lvl)
     print(f"exercise added to workout {last_id}")
+    return jsonify({"message": "exercise added"})
         
 
 if __name__ == "__main__":
