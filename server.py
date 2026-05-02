@@ -12,8 +12,6 @@ class Database:
         self.conn = sqlite3.connect(file_path)
         self.cursor = self.conn.cursor()
 
-db = Database("data.db")
-
 class Workout:
     @staticmethod
     def add_workout(db, date):
@@ -71,37 +69,46 @@ def create_tables(db):
     print("tables created maybe")
     
 @app.route("/add_exercise", methods=["POST"])
-def add_exercise() -> None:
-    data = request.get_json()
-    name = data["name"]
-    weight = data["weight"]
-    reps = data["reps"]
-    adjustment_lvl = data.get("adjustment_lvl")
-    today = str(datetime.date.today())
+def add_exercise():
+    db = Database("data.db")
+    try:
 
-    db.cursor.execute("SELECT MAX(id) FROM workouts")
-    last_id = db.cursor.fetchone()[0]
-    if last_id is None:
-        Workout.add_workout(db, today)
-        Exercise.add_exercise(db, 1, name, weight, reps, adjustment_lvl)
-        print(f"exercise added to workout {1}")
-        return jsonify({"message": "exercise added to workout 1"})
+        data = request.get_json()
+        name = data["name"]
+        weight = data["weight"]
+        reps = data["reps"]
+        adjustment_lvl = data.get("adjustment_lvl")
+        today = str(datetime.date.today())
+
+        db.cursor.execute("SELECT MAX(id) FROM workouts")
+        last_id = db.cursor.fetchone()[0]
+        if last_id is None:
+            Workout.add_workout(db, today)
+            Exercise.add_exercise(db, 1, name, weight, reps, adjustment_lvl)
+            print(f"exercise added to workout {1}")
+            return jsonify({"message": "exercise added to workout 1"})
+            
+        db.cursor.execute("SELECT date FROM workouts WHERE id = ?", (last_id,))
+        date = db.cursor.fetchone()[0]
+        if date != today:
+            Workout.add_workout(db, today)
+            Exercise.add_exercise(db, last_id + 1, name, weight, reps, adjustment_lvl)
+            print(f"exercise added to workout {last_id + 1}")
+            return jsonify({"message": f"exercise added to workout {last_id + 1}"})
         
-    db.cursor.execute("SELECT date FROM workouts WHERE id = ?", (last_id,))
-    date = db.cursor.fetchone()[0]
-    if date != today:
-        Workout.add_workout(db, today)
-        Exercise.add_exercise(db, last_id + 1, name, weight, reps, adjustment_lvl)
-        print(f"exercise added to workout {last_id + 1}")
-        return jsonify({"message": f"exercise added to workout {last_id + 1}"})
+        Exercise.add_exercise(db, last_id, name, weight, reps, adjustment_lvl)
+        print(f"exercise added to workout {last_id}")
+        print("Exercises", Exercise.get_exercises(db))
+        print("Workouts", Workout.get_workouts(db))
+        return jsonify({"message": "exercise added"})
     
-    Exercise.add_exercise(db, last_id, name, weight, reps, adjustment_lvl)
-    print(f"exercise added to workout {last_id}")
-    return jsonify({"message": "exercise added"})
+    finally:
+        db.conn.close()
         
 
 if __name__ == "__main__":
-    
+    db = Database("data.db")
+
 
     create_tables(db)
     print("Exercises", Exercise.get_exercises(db))
