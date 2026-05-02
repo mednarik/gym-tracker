@@ -104,8 +104,19 @@ def add_exercise():
     
     finally:
         db.conn.close()
-        
 
+@app.route("/get_workouts", methods=["GET"])
+def get_workouts():
+    db = Database("data.db")
+    try:
+        db.cursor.execute("SELECT * FROM workouts")
+        rows = db.cursor.fetchall()
+        return jsonify(rows)
+
+    finally:
+        db.conn.close()
+        
+    
 if __name__ == "__main__":
     db = Database("data.db")
 

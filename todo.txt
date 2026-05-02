@@ -1,0 +1,2 @@
+i gotta make html adjust the table size depending on how many workouts the request returns
+yk the one js function isnt finished

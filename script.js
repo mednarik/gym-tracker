@@ -10,6 +10,17 @@ async function post_exercise(name, weight, reps, adjustment_lvl) {
     );
 }
 
+async function get_workouts() {
+    const response = await fetch("http://localhost:5000/get_workouts")
+    const data = await response.json()
+    return data
+}
+
+async function enter_workouts_to_html() {
+    data = get_workouts();
+    
+}
+
 async function send_button_click() {
     let name = document.getElementById("name").value;
     let weight = document.getElementById("weight").value;
