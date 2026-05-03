@@ -17,8 +17,17 @@ async function get_workouts() {
 }
 
 async function enter_workouts_to_html() {
-    data = get_workouts();
-    
+    const data = await get_workouts();
+
+    const table = document.querySelector("table")
+
+    const row = table.insertRow()
+    row.insertCell().textContent = "Date"
+    data.forEach(workout => {
+        const row = table.insertRow()
+        row.insertCell().textContent = workout[1]
+
+    })
 }
 
 async function send_button_click() {
@@ -30,3 +39,4 @@ async function send_button_click() {
     await post_exercise(name, weight, reps, adjustment_lvl)
 }
 
+enter_workouts_to_html()
