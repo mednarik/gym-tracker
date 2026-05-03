@@ -1,6 +1,7 @@
+const server_addr = "http://localhost:5000"
 
 async function post_exercise(name, weight, reps, adjustment_lvl) {
-    await fetch("http://localhost:5000/add_exercise",
+    await fetch(server_addr + "/add_exercise",
         {
         method: "POST",
         headers: {"Content-Type": "application/json"},
@@ -11,7 +12,7 @@ async function post_exercise(name, weight, reps, adjustment_lvl) {
 }
 
 async function get_workouts() {
-    const response = await fetch("http://localhost:5000/get_workouts")
+    const response = await fetch(server_addr + "/get_workouts")
     const data = await response.json()
     return data
 }
@@ -21,8 +22,8 @@ async function enter_workouts_to_html() {
 
     const table = document.querySelector("table")
 
-    const row = table.insertRow()
-    row.insertCell().textContent = "Date"
+    const header_row = table.insertRow()
+    header_row.insertCell().textContent = "Date"
     data.forEach(workout => {
         const row = table.insertRow()
         row.insertCell().textContent = workout[1]
