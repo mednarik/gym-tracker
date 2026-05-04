@@ -33,7 +33,7 @@ class Exercise:
         db.cursor.execute("SELECT weight, reps FROM exercises WHERE workout_id = (?) AND name = (?)", (workout_id, name))
         row = db.cursor.fetchone()
         if row:
-            if weight > row[0] or reps > row[1]:
+            if float(weight) > row[0] or float(reps) > row[1]:
                 db.cursor.execute("UPDATE exercises SET weight = (?), reps = (?), adjustment_lvl = (?) WHERE name = (?) AND workout_id = (?)", 
                                 (weight, reps, adjustment_lvl, name, workout_id))
                 print("updated exercises stats")

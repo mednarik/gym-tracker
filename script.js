@@ -87,6 +87,7 @@ async function send_button_click() {
     let adjustment_lvl = document.getElementById("adjustment_lvl").value;
     
     await post_exercise(name, weight, reps, adjustment_lvl)
+    await initialise_html_table()
 }
 
 initialise_html_table()
