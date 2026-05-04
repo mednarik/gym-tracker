@@ -115,8 +115,30 @@ def get_workouts():
 
     finally:
         db.conn.close()
-        
-    
+
+
+@app.route("/get_unique_exercise_names", methods=["GET"])
+def get_unique_exercise_names():
+    db = Database("data.db")
+    try:
+        db.cursor.execute("SELECT DISTINCT name FROM exercises")
+        rows = db.cursor.fetchall()
+        frows = [row[0] for row in rows]
+        return jsonify(frows)
+    finally:
+        db.conn.close()   
+
+
+@app.route("/get_exercises", methods=["GET"])
+def get_exercises():
+    db = Database("data.db")
+    try:
+        db.cursor.execute("SELECT * FROM exercises")
+        rows = db.cursor.fetchall()
+        return jsonify(rows)
+    finally:
+        db.conn.close()    
+
 if __name__ == "__main__":
     db = Database("data.db")
 
