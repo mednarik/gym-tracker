@@ -1,4 +1,4 @@
-const server_addr = "http://10.0.104.133:5000"
+const server_addr = "http://localhost:5000"
 
 async function post_exercise(name, weight, reps, adjustment_lvl) {
     await fetch(server_addr + "/add_exercise",
