@@ -147,4 +147,4 @@ if __name__ == "__main__":
     print("Exercises", Exercise.get_exercises(db))
     print("Workouts", Workout.get_workouts(db))
     
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0")
