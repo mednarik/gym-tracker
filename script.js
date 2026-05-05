@@ -29,8 +29,7 @@ async function get_exercises() {
     return data
 }
 
-async function make_html_table() {
-    const data = await get_workouts();
+async function make_html_table(workouts, unique_names) {
 
     const table = document.querySelector("table")
     table.innerHTML = ""
@@ -38,12 +37,11 @@ async function make_html_table() {
     const header_row = table.insertRow()
     header_row.insertCell().textContent = "Date"
 
-    const unique_names = await get_unique_exercise_names()
     unique_names.forEach(name => {
         header_row.insertCell().textContent = name
     })
 
-    data.forEach(workout => {
+    workouts.forEach(workout => {
         const row = table.insertRow()
         row.insertCell().textContent = workout[1]
         unique_names.forEach(name => {
@@ -53,8 +51,7 @@ async function make_html_table() {
     })
 }
 
-async function make_exercise_menu() {
-    const exercises = await get_unique_exercise_names()
+async function make_exercise_menu(exercises) {
     const menu = document.getElementById("exercise_menu")
     menu.innerHTML = ""
     exercises.forEach(exercise => {
@@ -83,9 +80,8 @@ async function make_exercise_menu() {
 
 }
 
-async function fill_html_table() {
+async function fill_html_table(exercises) {
     const table = document.querySelector("table")
-    const exercises = await get_exercises()
     exercises.forEach(exercise => {
         const id = exercise[0]
         const workout_id = exercise[1]
@@ -107,9 +103,15 @@ async function fill_html_table() {
 
 
 async function initialise_html() {
-    await make_exercise_menu()
-    await make_html_table()
-    await fill_html_table()
+    const [workouts, unique_names, exercises] = await Promise.all([
+    get_workouts(),
+    get_unique_exercise_names(),
+    get_exercises()
+    ])
+
+    await make_exercise_menu(unique_names)
+    await make_html_table(workouts, unique_names)
+    await fill_html_table(exercises)
 }
 
 
@@ -123,5 +125,4 @@ async function send_button_click(button) {
     await post_exercise(name, weight, reps, adjustment_lvl)
     await initialise_html()
 }
-
 initialise_html()
