@@ -33,7 +33,7 @@ async function make_html_table() {
     const data = await get_workouts();
 
     const table = document.querySelector("table")
-
+    table.innerHTML = ""
     
     const header_row = table.insertRow()
     header_row.insertCell().textContent = "Date"
@@ -51,6 +51,36 @@ async function make_html_table() {
         })
 
     })
+}
+
+async function make_exercise_menu() {
+    const exercises = await get_unique_exercise_names()
+    const menu = document.getElementById("exercise_menu")
+    menu.innerHTML = ""
+    exercises.forEach(exercise => {
+        const div = document.createElement("div")
+        div.className = "exercise_row"
+        div.innerHTML = `
+            <input type="text" value="${exercise}">
+            <input type="text" placeholder="weight">
+            <input type="text" placeholder="reps">
+            <input type="text" placeholder="adjustment_lvl">
+            <button onclick="send_button_click(this)">send</button>
+            `
+        menu.appendChild(div)
+    })
+    
+    const div = document.createElement("div")
+    div.className = "exercise_row"
+    div.innerHTML = `
+        <input type="text" placeholder="name">
+        <input type="text" placeholder="weight">
+        <input type="text" placeholder="reps">
+        <input type="text" placeholder="adjustment_lvl">
+        <button onclick="send_button_click(this)">send</button>
+        `
+    menu.appendChild(div)
+
 }
 
 async function fill_html_table() {
@@ -71,26 +101,27 @@ async function fill_html_table() {
     })
 }
 
+
+
 //the functions below are button clicks and other directly called functions
 
 
-async function initialise_html_table() {
+async function initialise_html() {
+    await make_exercise_menu()
     await make_html_table()
     await fill_html_table()
 }
 
 
-async function send_button_click() {
-    let name = document.getElementById("name").value;
-    let weight = document.getElementById("weight").value;
-    let reps = document.getElementById("reps").value;
-    let adjustment_lvl = document.getElementById("adjustment_lvl").value;
+async function send_button_click(button) {
+    const inputs = button.parentElement.querySelectorAll("input")
+    const name = inputs[0].value
+    const weight = inputs[1].value
+    const reps = inputs[2].value   
+    const adjustment_lvl = inputs[3].value
     
     await post_exercise(name, weight, reps, adjustment_lvl)
-
-    const table = document.querySelector("table")
-    table.innerHTML = ""
-    await initialise_html_table()
+    await initialise_html()
 }
 
-initialise_html_table()
+initialise_html()

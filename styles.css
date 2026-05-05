@@ -3,3 +3,8 @@ table, td, tr{
     border-collapse: collapse;
     background-color: rgb(226, 226, 226);
 }
+
+#exercise_menu input{
+    margin: 5px;
+    padding: 0px;
+}
