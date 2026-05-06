@@ -142,10 +142,11 @@ def get_exercises():
 if __name__ == "__main__":
     db = Database("data.db")
     
-    online = False
+    online = True
 
     create_tables(db)
     print("Exercises", Exercise.get_exercises(db))
     print("Workouts", Workout.get_workouts(db))
+    db.conn.close()
     
-    app.run(debug=True, host="0.0.0.0" if online else "127.0.0.1")
+    app.run(debug=True, host="0.0.0.0" if online else "127.0.0.1", port=5000)
