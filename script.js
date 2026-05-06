@@ -51,19 +51,22 @@ async function make_html_table(workouts, unique_names) {
     })
 }
 
-async function make_exercise_menu(exercises) {
+async function make_exercise_menu(unique_names, exercises) {
     const menu = document.getElementById("exercise_menu")
     menu.innerHTML = ""
-    exercises.forEach(exercise => {
+
+    unique_names.forEach(unique_name => {
         const div = document.createElement("div")
         div.className = "exercise_row"
+
+        const latest = exercises.filter(e => e[2] === unique_name).at(-1)
         div.innerHTML = `
-            <input type="text" value="${exercise}">
-            <input type="text" placeholder="weight">
-            <input type="text" placeholder="reps">
-            <input type="text" placeholder="adjustment_lvl">
+            <input type="text" value="${unique_name}">
+            <input type="text" placeholder="weight" value="${latest ? latest[3] : ''}kg">
+            <input type="text" placeholder="reps" value="${latest ? latest[4] : ''}x">
+            <input type="text" placeholder="adjustment_lvl" value="${latest ? latest[5] : ''}">
             <button onclick="send_button_click(this)">send</button>
-            `
+        `
         menu.appendChild(div)
     })
     
@@ -97,8 +100,6 @@ async function fill_html_table(exercises) {
     })
 }
 
-
-
 //the functions below are button clicks and other directly called functions
 
 
@@ -109,7 +110,7 @@ async function initialise_html() {
     get_exercises()
     ])
 
-    await make_exercise_menu(unique_names)
+    await make_exercise_menu(unique_names, exercises)
     await make_html_table(workouts, unique_names)
     await fill_html_table(exercises)
 }
@@ -118,8 +119,8 @@ async function initialise_html() {
 async function send_button_click(button) {
     const inputs = button.parentElement.querySelectorAll("input")
     const name = inputs[0].value
-    const weight = inputs[1].value
-    const reps = inputs[2].value   
+    const weight = inputs[1].value.replace(/[^0-9.]/g, '')
+    const reps = inputs[2].value.replace(/[^0-9]/g, '')
     const adjustment_lvl = inputs[3].value
     
     await post_exercise(name, weight, reps, adjustment_lvl)
