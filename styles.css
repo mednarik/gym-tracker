@@ -5,6 +5,16 @@ table, td, tr{
     padding: 10px;
 }
 
+#exercise_menu {
+    text-align: center;
+    width: 100%;
+}
+
+table {
+    margin-left: auto;
+    margin-right: auto;
+}
+
 #exercise_menu, button, input{
     margin-top: 5px;   
     margin-bottom: 3px;    
