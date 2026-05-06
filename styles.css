@@ -2,9 +2,13 @@ table, td, tr{
     border: 2px solid black;
     border-collapse: collapse;
     background-color: rgb(226, 226, 226);
+    padding: 10px;
 }
 
-#exercise_menu input{
-    margin: 5px;
-    padding: 0px;
+#exercise_menu, button, input{
+    margin-top: 5px;   
+    margin-bottom: 3px;    
+    padding-top: 10px;
+    padding-bottom: 10px;
+
 }
