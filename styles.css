@@ -10,6 +10,10 @@ table, td, tr{
     width: 100%;
 }
 
+body {
+    font-family: Calibri;
+}
+
 table {
     margin-left: auto;
     margin-right: auto;
