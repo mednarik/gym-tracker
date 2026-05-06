@@ -93,7 +93,7 @@ async function fill_html_table(exercises) {
         const row = table.rows[workout_id]
         const col_index = Array.from(table.rows[0].cells).findIndex(cell => cell.textContent === name)
 
-        row.cells[col_index].textContent = `${weight}kg ${reps} reps`
+        row.cells[col_index].textContent = `${weight}kg x ${reps}`
     })
 }
 
