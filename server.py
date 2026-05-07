@@ -142,7 +142,7 @@ def get_exercises():
 if __name__ == "__main__":
     db = Database("data.db")
     
-    online = True
+    online = False
 
     create_tables(db)
     print("Exercises", Exercise.get_exercises(db))
