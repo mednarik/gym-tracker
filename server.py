@@ -20,7 +20,7 @@ class Workout:
             db.conn.commit()
             print("workout added")
         except sqlite3.IntegrityError:
-            print("ERROR: workout already exists for this date")
+            print("error: workout already exists for this date")
             
     @staticmethod
     def get_workouts(db):
@@ -86,7 +86,7 @@ def add_exercise():
             Workout.add_workout(db, today)
             Exercise.add_exercise(db, 1, name, weight, reps, adjustment_lvl)
             print(f"exercise added to workout {1}")
-            return jsonify({"message": "exercise added to workout 1"})
+            return  jsonify({"message": "exercise added to workout 1"})
             
         db.cursor.execute("SELECT date FROM workouts WHERE id = ?", (last_id,))
         date = db.cursor.fetchone()[0]
