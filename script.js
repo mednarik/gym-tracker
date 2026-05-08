@@ -100,27 +100,49 @@ async function fill_html_table(exercises) {
     })
 }
 
-function make_chart(){
+function make_chart(workouts, unique_names, exercises){
     const ctx = document.getElementById("chart");
 
+    let datasets = []
+    unique_names.forEach(name => {
+        dataset = {label: name, data: []}
+        exercises.forEach(exercise => {
+            if (exercise[2] === name) {
+                dataset["data"].push(exercise[3])
+            }
+        })
+        datasets.push(dataset)
+    })
+
     new Chart(ctx, {
-    type: "line",        // or bar, pie, etc.
-    data: {
-        labels: ["Mon", "Tue", "Wed"],
-        datasets: [{
-        label: "Weight (kg)",
-        data: [80, 82, 81],
-        borderColor: "rgba(75, 192, 192, 1)",
-        tension: 0.1
-        }]
-    }
+        type: "line",        
+        data: {
+            labels: workouts,
+            datasets: datasets
+        },
+        options: {
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: "Date"
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: "Weight (kg)"
+                    }
+                }
+            }
+        }
     });
 }
 
 //the functions below are button clicks and other directly called functions
 
 
-async function initialise_html() {
+async function initialise() {
     const [workouts, unique_names, exercises] = await Promise.all([
     get_workouts(),
     get_unique_exercise_names(),
@@ -130,6 +152,7 @@ async function initialise_html() {
     await make_exercise_menu(unique_names, exercises)
     await make_html_table(workouts, unique_names)
     await fill_html_table(exercises)
+    make_chart(workouts, unique_names, exercises)
 }
 
 
@@ -141,6 +164,6 @@ async function send_button_click(button) {
     const adjustment_lvl = inputs[3].value
     
     await post_exercise(name, weight, reps, adjustment_lvl)
-    await initialise_html()
+    await initialise()
 }
-initialise_html()
+initialise()
