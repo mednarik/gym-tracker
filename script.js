@@ -4,7 +4,7 @@ const frameworks = ["React", "Angular", "Vue", "Hyperapp", "Omi"]
 const ctx = document.getElementById("myChart")
 
 const myChart = new Chart(ctx, {
-    type: "bar",
+    type: "pie",
     data: {
         labels: frameworks,
         datasets: [
