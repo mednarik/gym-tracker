@@ -100,6 +100,23 @@ async function fill_html_table(exercises) {
     })
 }
 
+function make_chart(){
+    const ctx = document.getElementById("chart");
+
+    new Chart(ctx, {
+    type: "line",        // or bar, pie, etc.
+    data: {
+        labels: ["Mon", "Tue", "Wed"],
+        datasets: [{
+        label: "Weight (kg)",
+        data: [80, 82, 81],
+        borderColor: "rgba(75, 192, 192, 1)",
+        tension: 0.1
+        }]
+    }
+    });
+}
+
 //the functions below are button clicks and other directly called functions
 
 
