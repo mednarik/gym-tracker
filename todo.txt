@@ -1,0 +1,3 @@
+i found out that each exercise needs to have an entry for every single workout or else the visualizing won't workout
+to fix that, each time a new exercise entry is being made, i need to check if it skipped the previous time.
+if it got skipped, i also need to insert the average of the last entry and the current aside from only the current
