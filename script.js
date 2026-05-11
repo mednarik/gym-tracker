@@ -105,7 +105,7 @@ function make_chart(workouts, unique_names, exercises){
 
     let datasets = []
     unique_names.forEach(name => {
-        dataset = {label: name, data: []}
+        dataset = {label: name, data: [], tension: 0.3}
         exercises.forEach(exercise => {
             if (exercise[2] === name) {
                 dataset["data"].push(exercise[3])
@@ -118,7 +118,7 @@ function make_chart(workouts, unique_names, exercises){
         type: "line",        
         data: {
             labels: workouts,
-            datasets: datasets
+            datasets: datasets,
         },
         options: {
             scales: {
