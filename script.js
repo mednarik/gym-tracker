@@ -101,7 +101,7 @@ async function fill_html_table(exercises) {
 }
 
 function range(start, end) {
-  return Array.from({ length: end - start + 1 }, (_, i) => i + start);
+  return Array.from({ length: end - start}, (_, i) => i + start);
 }
 
 function make_chart(workouts, unique_names, exercises){
@@ -119,16 +119,19 @@ function make_chart(workouts, unique_names, exercises){
             }
         })
         
-        let arr
+        let inserted_lines = []
         if (first_id > 1) {
             range(1, first_id).forEach(n => {
-                //make an exercise entry line with the workout id = n
-                //add it to arr
+                //make an exercise entry line where the workout id == n
+                let entry = [null, n, name, 0, 0]
+                //add it to inserted_lines
+                inserted_lines.push(entry)
             })
         }
-        //exercises = [...arr, ...exercises]
+        exercises = [...inserted_lines, ...exercises]
+        //now there should be an exercise for every workout before the first real workout
 
-        dataset = {label: name, data: [], tension: 0.3}
+        let dataset = {label: name, data: [], tension: 0.3}
         exercises.forEach(exercise => {
             if (exercise[2] === name) {
                 dataset["data"].push(exercise[3])
