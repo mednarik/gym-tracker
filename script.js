@@ -100,11 +100,34 @@ async function fill_html_table(exercises) {
     })
 }
 
+function range(start, end) {
+  return Array.from({ length: end - start + 1 }, (_, i) => i + start);
+}
+
 function make_chart(workouts, unique_names, exercises){
+
     const ctx = document.getElementById("chart");
+
 
     let datasets = []
     unique_names.forEach(name => {
+
+        let first_id
+        exercises.forEach(exercise => {
+            if (exercise[2] === name && first_id === undefined) {
+                first_id = exercise[1]
+            }
+        })
+        
+        let arr
+        if (first_id > 1) {
+            range(1, first_id).forEach(n => {
+                //make an exercise entry line with the workout id = n
+                //add it to arr
+            })
+        }
+        //exercises = [...arr, ...exercises]
+
         dataset = {label: name, data: [], tension: 0.3}
         exercises.forEach(exercise => {
             if (exercise[2] === name) {
@@ -138,6 +161,7 @@ function make_chart(workouts, unique_names, exercises){
         }
     });
 }
+
 
 //the functions below are button clicks and other directly called functions
 
