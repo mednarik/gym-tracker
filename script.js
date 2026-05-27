@@ -112,24 +112,27 @@ function make_chart(workouts, unique_names, exercises){
     let datasets = []
     unique_names.forEach(name => {
 
-        let first_id
+        let current_exercises = []
+
         exercises.forEach(exercise => {
-            if (exercise[2] === name && first_id === undefined) {
-                first_id = exercise[1]
+            if (exercise === name) {
+                current_exercises.push(exercise)
             }
         })
-        
-        let inserted_lines = []
-        if (first_id > 1) {
-            range(1, first_id).forEach(n => {
-                //make an exercise entry line where the workout id == n
-                let entry = [null, n, name, 0, 0]
-                //add it to inserted_lines
-                inserted_lines.push(entry)
+
+        range(0, workouts.length).forEach(i => {
+            let date = workouts[i][1]
+            let id = workouts[i][0]
+
+            current_exercises.forEach(ce => {
+                if (ce[1] === id) {
+                    break
+                }//somehow i gotta make it so that the previous stats gets inserted as a new exercise if an exercise is missing on a workout
             })
-        }
-        exercises = [...inserted_lines, ...exercises]
-        //now there should be an exercise for every workout before the first real workout
+
+        })
+
+
 
         let dataset = {label: name, data: [], tension: 0.3}
         exercises.forEach(exercise => {
