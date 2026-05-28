@@ -137,7 +137,7 @@ def get_exercises():
         rows = db.cursor.fetchall()
         return jsonify(rows)
     finally:
-        db.conn.close()    
+        db.conn.close()
 
 if __name__ == "__main__":
     db = Database("data.db")

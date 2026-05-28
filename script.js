@@ -126,8 +126,8 @@ function make_chart(workouts, unique_names, exercises){
 
             current_exercises.forEach(ce => {
                 if (ce[1] === id) {
-                    break
                 }//somehow i gotta make it so that the previous stats gets inserted as a new exercise if an exercise is missing on a workout
+                //maybe i can use binary search
             })
 
         })
